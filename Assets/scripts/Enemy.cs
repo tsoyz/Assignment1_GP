@@ -5,15 +5,14 @@ public class Enemy : MonoBehaviour
     public float health = 50f; // Health value of the enemy
     public GameObject hitEffect; // Particle effect to play when bullet hits the enemy
 
-    private bool isHit = false; // Flag to prevent multiple collisions
+    private bool isDestroyed = false; // Flag to prevent multiple destruction calls
 
     public delegate void EnemyDestroyedHandler(GameObject enemy);
     public event EnemyDestroyedHandler OnEnemyDestroyed;
 
     public void TakeDamage(float damageAmount)
     {
-        if (isHit) return; // Prevent multiple hits
-        isHit = true;
+        if (isDestroyed) return; // Prevent taking damage if already destroyed
 
         health -= damageAmount; // Reduce health by the damage amount
         Debug.Log("Enemy took damage! Current health: " + health);
@@ -32,43 +31,32 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (isHit) return; // Prevent multiple triggers
-        Debug.Log("OnTriggerEnter detected: " + other.name);
-
-        Bullet bullet = other.GetComponent<Bullet>();
-        if (bullet != null)
-        {
-            Debug.Log("Enemy hit by bullet! Bullet damage: " + bullet.damage);
-
-            // Take damage from the bullet and destroy it
-            TakeDamage(bullet.damage);
-            Destroy(bullet.gameObject);
-        }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (isHit) return; // Prevent multiple collisions
-        Debug.Log("OnCollisionEnter detected: " + collision.gameObject.name);
-
-        Bullet bullet = collision.gameObject.GetComponent<Bullet>();
-        if (bullet != null)
-        {
-            Debug.Log("Enemy hit by bullet! Bullet damage: " + bullet.damage);
-
-            // Take damage from the bullet and destroy it
-            TakeDamage(bullet.damage);
-            Destroy(bullet.gameObject);
-        }
-    }
-
     // Method to handle the destruction of the enemy
     public void DestroyEnemy()
     {
+        if (isDestroyed) return; // Prevent double triggering
+        isDestroyed = true; // Mark as destroyed
+
         Debug.Log("Enemy destroyed!");
-        OnEnemyDestroyed?.Invoke(gameObject); // Notify listeners that the enemy is destroyed
-        Destroy(gameObject); // Destroy the enemy GameObject
+
+        // Trigger the OnEnemyDestroyed event before the enemy is destroyed
+        if (OnEnemyDestroyed != null)
+        {
+            OnEnemyDestroyed(gameObject); // Notify listeners that the enemy is destroyed
+        }
+
+        // Destroy the enemy GameObject
+        Destroy(gameObject);
+    }
+
+    // Collision or trigger logic to detect bullets
+    private void OnCollisionEnter(Collision collision)
+    {
+        Bullet bullet = collision.gameObject.GetComponent<Bullet>();
+        if (bullet != null)
+        {
+            TakeDamage(bullet.damage); // Take damage from the bullet
+            Destroy(bullet.gameObject); // Destroy the bullet
+        }
     }
 }

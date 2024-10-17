@@ -7,13 +7,14 @@ public class EnemySpawner : MonoBehaviour
     public GameObject[] enemyPrefabs; // Array to hold different enemy prefabs
     public int enemyCount = 5; // Number of enemies to spawn
 
-    public Vector3 corner1 = new Vector3(88.9000015f, 50.5f, 192.119995f);
-    public Vector3 corner2 = new Vector3(144.600006f, 50.5f, 192.119995f);
-    public Vector3 corner3 = new Vector3(144.600006f, 50.5f, 33.6883698f);
-    public Vector3 corner4 = new Vector3(88.9000015f, 50.5f, 33.6883698f);
-    public Vector3 spawnPoint; // Manually set the spawn point for spawning above it
+    // Replace Vector3 corners with GameObjects
+    public GameObject corner1Object;
+    public GameObject corner2Object;
+    public GameObject corner3Object;
+    public GameObject corner4Object;
+    public GameObject spawnPointObject; // Object that defines the spawn point
 
-    public float spawnHeight = 5.0f; // Height above the spawn point where enemies will spawn
+    public float spawnHeight = 5.0f; // Height above the spawn point for spawning
     private List<GameObject> spawnedEnemies = new List<GameObject>(); // Track currently spawned enemies
 
     private Vector3 minBounds; // Minimum bounds of the spawn area
@@ -25,10 +26,16 @@ public class EnemySpawner : MonoBehaviour
         SpawnInitialEnemies();
     }
 
-    // Calculate the min and max bounds based on the 4 manually set corners
+    // Calculate the min and max bounds based on the GameObjects' positions
     void CalculateBounds()
     {
-        Vector3[] corners = new Vector3[4] { corner1, corner2, corner3, corner4 };
+        Vector3[] corners = new Vector3[4]
+        {
+            corner1Object.transform.position,
+            corner2Object.transform.position,
+            corner3Object.transform.position,
+            corner4Object.transform.position
+        };
 
         minBounds = corners[0];
         maxBounds = corners[0];
@@ -55,10 +62,13 @@ public class EnemySpawner : MonoBehaviour
         // Choose a random enemy prefab
         GameObject enemyToSpawn = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
 
+        // Get the spawn point's Y position from the spawnPointObject
+        Vector3 spawnPointPosition = spawnPointObject.transform.position;
+
         // Generate a random position within the spawn area bounds and above the spawn point
         Vector3 spawnPosition = new Vector3(
             Random.Range(minBounds.x, maxBounds.x), // Random X position within bounds
-            spawnPoint.y + spawnHeight,             // Spawn height above the spawn point
+            spawnPointPosition.y + spawnHeight,     // Spawn height above the spawn point
             Random.Range(minBounds.z, maxBounds.z)  // Random Z position within bounds
         );
 
@@ -74,15 +84,19 @@ public class EnemySpawner : MonoBehaviour
 
         // Track the spawned enemy
         spawnedEnemies.Add(newEnemy);
+
+        // Notify the GameManager that an enemy has been spawned (for total count)
+        GameManager.Instance.RegisterEnemy(enemyScript);
     }
 
+    // Handle when an enemy is destroyed
     void HandleEnemyDestroyed(GameObject destroyedEnemy)
     {
         // Remove the destroyed enemy from the tracking list
         spawnedEnemies.Remove(destroyedEnemy);
 
-        // Spawn a new enemy to maintain the count
-        SpawnEnemy();
+        // Notify GameManager that an enemy has been destroyed
+        GameManager.Instance.EnemyKilled(destroyedEnemy);
     }
 
     // Draw the spawn area bounds in the Scene view for visualization
@@ -90,14 +104,20 @@ public class EnemySpawner : MonoBehaviour
     {
         Gizmos.color = Color.green;
 
-        // Draw lines between the manually set corner points
-        Gizmos.DrawLine(corner1, corner2);
-        Gizmos.DrawLine(corner2, corner3);
-        Gizmos.DrawLine(corner3, corner4);
-        Gizmos.DrawLine(corner4, corner1);
+        // Draw lines between the corner GameObjects
+        if (corner1Object && corner2Object && corner3Object && corner4Object)
+        {
+            Gizmos.DrawLine(corner1Object.transform.position, corner2Object.transform.position);
+            Gizmos.DrawLine(corner2Object.transform.position, corner3Object.transform.position);
+            Gizmos.DrawLine(corner3Object.transform.position, corner4Object.transform.position);
+            Gizmos.DrawLine(corner4Object.transform.position, corner1Object.transform.position);
+        }
 
         // Draw the spawn point location
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(spawnPoint, 0.3f); // Red sphere at the spawn point for visualization
+        if (spawnPointObject)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(spawnPointObject.transform.position, 0.3f); // Red sphere at the spawn point for visualization
+        }
     }
 }

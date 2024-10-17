@@ -24,4 +24,18 @@ public class Bullet : MonoBehaviour
         }
     }
 
+    // Handle collision with enemies
+    private void OnCollisionEnter(Collision collision)
+    {
+        // Check if the bullet hits an enemy
+        Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            // Apply damage to the enemy
+            enemy.TakeDamage(damage);
+        }
+
+        // Destroy the bullet on impact
+        Destroy(gameObject);
+    }
 }

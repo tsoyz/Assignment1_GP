@@ -28,18 +28,18 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) { transform.Translate(Vector3.left * speed * Time.deltaTime); }
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) { transform.Translate(Vector3.right * speed * Time.deltaTime); }
 
+        // Add a deadzone for mouse movement to prevent unintended rotation
         float mouseX = Input.GetAxis("Mouse X");
-        transform.Rotate(Vector3.up, mouseX * rotationSpeed * Time.deltaTime);
+
+        if (Mathf.Abs(mouseX) > 0.1f) // 0.1f is the deadzone threshold, adjust as needed
+        {
+            transform.Rotate(Vector3.up, mouseX * rotationSpeed * Time.deltaTime);
+        }
 
         // Jump when the player presses the spacebar and is grounded
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            // Using ForceMode.VelocityChange for an immediate jump
             rb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
-
-            // Alternatively, set the Rigidbody velocity directly for instant jump
-            // rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
-
             isGrounded = false; // Set isGrounded to false after jumping
         }
     }
