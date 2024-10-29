@@ -285,8 +285,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
-  hitEffect: {fileID: 1056707272700979425, guid: 6150e086f0483408a85d8c5065cb484c,
+  hitEffect: {fileID: 7819507489250268489, guid: 80d82ddc44558480697d90ea4f064931,
     type: 3}
+  isRegistered: 0
+  isDestroyed: 0
 --- !u!114 &-5957758866726565657
 MonoBehaviour:
   m_ObjectHideFlags: 0

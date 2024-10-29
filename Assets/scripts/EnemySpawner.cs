@@ -5,7 +5,8 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     public GameObject[] enemyPrefabs; // Array to hold different enemy prefabs
-    public int enemyCount = 5; // Number of enemies to spawn
+    public int numberOfSkeletons = 10; // Number of skeletons to spawn
+    public int numberOfGhosts = 5; // Number of ghosts to spawn
 
     // Replace Vector3 corners with GameObjects
     public GameObject corner1Object;
@@ -50,18 +51,44 @@ public class EnemySpawner : MonoBehaviour
     // Spawns the initial batch of enemies
     void SpawnInitialEnemies()
     {
-        for (int i = 0; i < enemyCount; i++)
+        // Check if enemyPrefabs array has enough elements to avoid IndexOutOfRangeException
+        if (enemyPrefabs.Length > 0)
         {
-            SpawnEnemy();
+            for (int i = 0; i < numberOfSkeletons; i++)
+            {
+                SpawnEnemy(enemyPrefabs[0]); // Assuming skeleton is at index 0
+            }
+        }
+
+        if (enemyPrefabs.Length > 1)
+        {
+            for (int i = 0; i < numberOfGhosts; i++)
+            {
+                SpawnEnemy(enemyPrefabs[1]); // Assuming ghost is at index 1
+            }
+        }
+
+        // Additional enemy types if available in the prefabs array
+        if (enemyPrefabs.Length > 2)
+        {
+            for (int i = 0; i < numberOfGhosts; i++) // Adjust loop as per requirements
+            {
+                SpawnEnemy(enemyPrefabs[2]); // Assuming another enemy type at index 2
+            }
+        }
+
+        if (enemyPrefabs.Length > 3)
+        {
+            for (int i = 0; i < numberOfGhosts; i++) // Adjust loop as per requirements
+            {
+                SpawnEnemy(enemyPrefabs[3]); // Assuming another enemy type at index 3
+            }
         }
     }
 
     // Spawn a single enemy at a random position within the spawn area bounds
-    void SpawnEnemy()
+    void SpawnEnemy(GameObject enemyToSpawn)
     {
-        // Choose a random enemy prefab
-        GameObject enemyToSpawn = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
-
         // Get the spawn point's Y position from the spawnPointObject
         Vector3 spawnPointPosition = spawnPointObject.transform.position;
 

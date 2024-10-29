@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Mine : MonoBehaviour
@@ -12,9 +10,8 @@ public class Mine : MonoBehaviour
     {
         // Check if the object that entered the trigger is an enemy
         Enemy enemy = other.GetComponent<Enemy>();
-        if (enemy != null)
+        if (enemy != null && !enemy.isDestroyed) // Add isDestroyed check
         {
-            // Trigger the explosion and destroy the enemy
             Explode();
             enemy.DestroyEnemy(); // Destroy the enemy and trigger the event
         }

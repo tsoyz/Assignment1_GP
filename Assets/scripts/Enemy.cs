@@ -5,7 +5,8 @@ public class Enemy : MonoBehaviour
     public float health = 50f; // Health value of the enemy
     public GameObject hitEffect; // Particle effect to play when bullet hits the enemy
 
-    private bool isDestroyed = false; // Flag to prevent multiple destruction calls
+    public bool isRegistered = false; // Flag to check if the enemy is registered with the GameManager
+    public bool isDestroyed = false; // Flag to prevent multiple destruction calls
 
     public delegate void EnemyDestroyedHandler(GameObject enemy);
     public event EnemyDestroyedHandler OnEnemyDestroyed;
@@ -20,8 +21,9 @@ public class Enemy : MonoBehaviour
         // Play hit particle effect if available
         if (hitEffect != null)
         {
-            GameObject effect = Instantiate(hitEffect, transform.position, Quaternion.identity);
-            Destroy(effect, 2f); // Destroy the effect after 2 seconds
+            Vector3 effectPosition = transform.position + new Vector3(0, 1.0f, 0); // Adjust Y value as needed
+            GameObject effect = Instantiate(hitEffect, effectPosition, Quaternion.identity);
+            Destroy(effect, 2f);
         }
 
         // If health drops below zero, destroy the enemy
@@ -44,6 +46,9 @@ public class Enemy : MonoBehaviour
         {
             OnEnemyDestroyed(gameObject); // Notify listeners that the enemy is destroyed
         }
+
+        // Unsubscribe all listeners to ensure no double notification
+        OnEnemyDestroyed = null;
 
         // Destroy the enemy GameObject
         Destroy(gameObject);

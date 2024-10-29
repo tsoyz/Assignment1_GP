@@ -29,7 +29,7 @@ public class Bullet : MonoBehaviour
     {
         // Check if the bullet hits an enemy
         Enemy enemy = collision.gameObject.GetComponent<Enemy>();
-        if (enemy != null)
+        if (enemy != null && !enemy.isDestroyed) // Add isDestroyed check
         {
             // Apply damage to the enemy
             enemy.TakeDamage(damage);

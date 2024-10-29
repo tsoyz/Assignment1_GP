@@ -5,7 +5,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     private int currentEnemyCount = 0;
-    private int totalEnemyCount=0;
+    private int totalEnemyCount = 0;
 
     private void Awake()
     {
@@ -22,8 +22,15 @@ public class GameManager : MonoBehaviour
 
     public void EnemyKilled(GameObject enemy)
     {
-        currentEnemyCount--;
-        Debug.Log("Enemy killed! Enemies left: " + currentEnemyCount);
+        if (currentEnemyCount > 0)
+        {
+            currentEnemyCount--;
+            Debug.Log("Enemy killed! Enemies left: " + currentEnemyCount);
+        }
+        else
+        {
+            Debug.LogWarning("Attempted to kill an enemy, but count is already zero.");
+        }
 
         if (currentEnemyCount <= 0)
         {
@@ -36,14 +43,16 @@ public class GameManager : MonoBehaviour
         Debug.Log("Player has won!");
         SceneManager.LoadScene("WinScene");
     }
+
     public void RegisterEnemy(Enemy enemy)
     {
+        if (enemy.isRegistered) return;
+
+        enemy.isRegistered = true;
+        enemy.OnEnemyDestroyed -= EnemyKilled; // Ensure no double subscription
+        enemy.OnEnemyDestroyed += EnemyKilled;
         totalEnemyCount++;
         currentEnemyCount++;
         Debug.Log("Registering enemy: " + enemy.gameObject.name);
-
-        // Unsubscribe first to ensure no double subscription
-        enemy.OnEnemyDestroyed -= EnemyKilled;
-        enemy.OnEnemyDestroyed += EnemyKilled;
     }
 }
