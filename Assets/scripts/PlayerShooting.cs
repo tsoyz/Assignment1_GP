@@ -4,25 +4,54 @@ using UnityEngine;
 
 public class PlayerShooting : MonoBehaviour
 {
+    private Animator animator;
     public GameObject bulletPrefab; // Bullet prefab
     public GameObject shootPoint; // Point where the bullet is shot from
-    public GameObject shootEffect; // Particle effect for shooting
+    public GameObject shootEffect; // Particle effect for shooting\
+    public AudioSource shootSound1;
 
     public GameObject minePrefab; // Mine prefab to drop
     public Transform mineSpawnPoint; // Point where the mine is dropped
 
+    private void Start()
+    {
+        animator = GetComponent<Animator>();
+    }
     void Update()
     {
-        // Handle shooting with the left mouse button
-        if (Input.GetKeyDown(KeyCode.Mouse0)) // Left mouse button
+        if (!PauseMenu.isPaused)
         {
-            ShootBullet();
-        }
+                // Handle shooting with the left mouse button
+            if (Input.GetKeyDown(KeyCode.Mouse0)) // Left mouse button
+            {
+                ShootBullet();
+                animator.SetBool("fire", true);
+                //if (animator.GetBool("walk") || animator.GetBool("run"))
+                //{
+                //    animator.SetBool("walkFiring", true);
+                //} else 
+                //{
+                //    animator.SetBool("standFiring", true);
+                //}
+            }
+        
+            if (Input.GetKeyUp(KeyCode.Mouse0)) // Left mouse button
+            {
+                animator.SetBool("fire", false);
+                //if (animator.GetBool("walk") || animator.GetBool("run"))
+                //{
+                //    animator.SetBool("walkFiring", false);
+                //} else 
+                //{
+                //    animator.SetBool("standFiring", false);
+                //}
+            }
 
-        // Handle dropping the mine with the "E" key
-        if (Input.GetKeyDown(KeyCode.E)) // 'E' key for mine
-        {
-            DropMine();
+            // Handle dropping the mine with the "E" key
+            if (Input.GetKeyDown(KeyCode.E)) // 'E' key for mine
+            {
+                DropMine();
+            }
         }
     }
 
@@ -37,7 +66,10 @@ public class PlayerShooting : MonoBehaviour
         {
             GameObject effect = Instantiate(shootEffect, shootPoint.transform.position, shootPoint.transform.rotation);
             Destroy(effect, 2f); // Destroy the effect after 2 seconds
+            shootSound1.Play();
         }
+
+        animator.SetBool("fire", false);
     }
 
     // Method to drop the mine

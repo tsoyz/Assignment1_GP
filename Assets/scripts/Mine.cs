@@ -5,6 +5,7 @@ public class Mine : MonoBehaviour
     public float explosionRadius = 5f; // Radius within which objects are affected
     public GameObject explosionEffect; // Explosion effect prefab
     public float effectDuration = 2f; // Time before the explosion effect is removed
+    public AudioSource mineSound;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -26,14 +27,24 @@ public class Mine : MonoBehaviour
             Destroy(effect, effectDuration); // Destroy the effect after the set duration
         }
 
-        // Destroy the mine itself after the explosion
+        // Play the sound using a temporary GameObject
+        if (mineSound != null)
+        {
+            GameObject tempAudio = new GameObject("MineSound");
+            AudioSource tempSource = tempAudio.AddComponent<AudioSource>();
+            tempSource.clip = mineSound.clip;
+            tempSource.Play();
+            Destroy(tempAudio, mineSound.clip.length);
+        }
+
+        // Destroy the mine itself
         Destroy(gameObject);
     }
 
     // Visualize the explosion radius in the editor
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.gray;
         Gizmos.DrawWireSphere(transform.position, explosionRadius);
     }
 }

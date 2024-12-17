@@ -104,6 +104,8 @@ MonoBehaviour:
   explosionEffect: {fileID: 8630659642258713022, guid: 83288f84f71984312899ef33cd14ad90,
     type: 3}
   effectDuration: 2
+  mineSound: {fileID: 1478912721368479078, guid: 3ada8e51a74ff4945817498e9e8bbb08,
+    type: 3}
 --- !u!54 &5064108614535683623
 Rigidbody:
   m_ObjectHideFlags: 0
